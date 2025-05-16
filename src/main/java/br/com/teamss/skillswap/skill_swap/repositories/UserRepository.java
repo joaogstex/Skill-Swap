@@ -1,4 +1,4 @@
-package br.com.teamss.skillswap.skill_swap.repository;
+package br.com.teamss.skillswap.skill_swap.repositories;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
