@@ -3,6 +3,8 @@ package br.com.teamss.skillswap.skill_swap.entities;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -26,6 +28,7 @@ public class Profile {
 
     @OneToOne
     @JoinColumn(name = "user_id")
+    @JsonManagedReference
     private User user;
 
     private String description;
@@ -51,4 +54,6 @@ public class Profile {
     private String experienceLevel;
 
     private String educationLevel;
+    
+    public Profile() {}
 }

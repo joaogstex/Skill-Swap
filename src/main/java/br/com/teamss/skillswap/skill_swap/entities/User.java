@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,7 +26,7 @@ import lombok.Data;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "user_id")
+    @Column(name = "user_id", columnDefinition = "UUID")
     private UUID userId;
 
     @Column(unique = true)
@@ -41,7 +43,7 @@ public class User {
     @ManyToMany(mappedBy = "users")
     private Set<Skill> skills = new HashSet<>();
     
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "profile_id")
+    @OneToOne(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JsonBackReference
     private Profile profile;
 }
