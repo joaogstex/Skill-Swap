@@ -12,11 +12,17 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "tb_posts")
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -39,4 +45,31 @@ public class Post {
     private Instant createdAt;
     //private String imageUrl;
     //private String videoUrl;
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((postId == null) ? 0 : postId.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Post other = (Post) obj;
+        if (postId == null) {
+            if (other.postId != null)
+                return false;
+        } else if (!postId.equals(other.postId))
+            return false;
+        return true;
+    }
+
+    
 }

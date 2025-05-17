@@ -64,5 +64,5 @@ CREATE TABLE IF NOT EXISTS tb_posts (
 );
 
 -- Dados iniciais
-INSERT INTO tb_roles (role_id, name) VALUES (1, 'USER');
-INSERT INTO tb_roles (role_id, name) VALUES (2, 'ADMIN');
+--INSERT INTO tb_roles (role_id, name) VALUES (1, 'USER');
+--INSERT INTO tb_roles (role_id, name) VALUES (2, 'ADMIN');

@@ -15,11 +15,15 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "tb_profiles")
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
 public class Profile {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -56,4 +60,31 @@ public class Profile {
     private String educationLevel;
     
     public Profile() {}
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((profileId == null) ? 0 : profileId.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Profile other = (Profile) obj;
+        if (profileId == null) {
+            if (other.profileId != null)
+                return false;
+        } else if (!profileId.equals(other.profileId))
+            return false;
+        return true;
+    }
+
+    
 }

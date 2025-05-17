@@ -1,5 +1,6 @@
 package br.com.teamss.skillswap.skill_swap.dto;
 
-public class RoleDTO {
-
-}
+public record RoleDTO(
+    Long roleId,
+    String name
+) {}

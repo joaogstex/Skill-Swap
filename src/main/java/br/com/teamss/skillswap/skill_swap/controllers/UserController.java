@@ -23,18 +23,6 @@ public class UserController {
         this.userService = userService;
     }
 
-    /**
-     * @GetMapping
-     *             public List<User> getAllUsers() {
-     *             return userService.findAll();
-     *             }
-     * 
-     *             @GetMapping("/{id}")
-     *             public ResponseEntity<User> getUserById(@PathVariable UUID id) {
-     *             return ResponseEntity.ok(userService.findById(id));
-     *             }
-     */
-
     @GetMapping
     public List<UserDTO> getAllUsers() {
         return userServiceDTO.findAllDTO();
@@ -49,6 +37,26 @@ public class UserController {
     public ResponseEntity<UserDTO> createUser(@RequestBody User user) {
         User savedUser = userService.save(user);
         UserDTO userDTO = userServiceDTO.toUserDTO(savedUser);
+        return ResponseEntity.ok(userDTO);
+    }
+
+    @PostMapping("/{userId}/skills")
+    public ResponseEntity<UserDTO> addSkillsToUser(
+            @PathVariable UUID userId,
+            @RequestBody List<Long> skillIds) {
+
+        User updatedUser = userService.addSkills(userId, skillIds);
+        UserDTO userDTO = userServiceDTO.toUserDTO(updatedUser);
+        return ResponseEntity.ok(userDTO);
+    }
+
+    @PostMapping("/{userId}/roles")
+    public ResponseEntity<UserDTO> addRolesToUser(
+            @PathVariable UUID userId,
+            @RequestBody List<Long> roleIds) {
+
+        User updatedUser = userService.addRoles(userId, roleIds);
+        UserDTO userDTO = userServiceDTO.toUserDTO(updatedUser);
         return ResponseEntity.ok(userDTO);
     }
 

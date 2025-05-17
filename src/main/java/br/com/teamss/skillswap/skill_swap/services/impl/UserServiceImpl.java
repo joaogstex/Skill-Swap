@@ -1,6 +1,5 @@
 package br.com.teamss.skillswap.skill_swap.services.impl;
 
-import br.com.teamss.skillswap.skill_swap.entities.Profile;
 import br.com.teamss.skillswap.skill_swap.entities.Role;
 import br.com.teamss.skillswap.skill_swap.entities.Skill;
 import br.com.teamss.skillswap.skill_swap.entities.User;
@@ -18,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -71,6 +71,7 @@ public class UserServiceImpl implements UserService {
                 Skill managedSkill = skillRepository.findById(skill.getSkillId())
                         .orElseThrow(() -> new EntityNotFoundException("Skill não encontrada: " + skill.getSkillId()));
                 managedSkills.add(managedSkill);
+                managedSkill.getUsers().add(user);
             }
         }
         user.setSkills(managedSkills);
@@ -93,65 +94,59 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
-    /**
-     * public User update(UUID id, User userUpdate) {
-     * User user = findById(id);
-     * user.setUsername(userUpdate.getUsername());
-     * user.setPassword(userUpdate.getPassword());
-     * user.setRoles(userUpdate.getRoles());
-     * user.setProfile(userUpdate.getProfile());
-     * return userRepository.save(user);
-     * }
-     */
     @Override
-    public User update(UUID id, User userUpdate) {
-        User user = findById(id);
+    public User addSkills(UUID userId, List<Long> skillIds) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
 
-        //atualiza username e password simples
-        user.setUsername(userUpdate.getUsername());
-        user.setPassword(userUpdate.getPassword());
+        Set<Skill> managedSkills = skillIds.stream()
+                .map(id -> skillRepository.findById(id)
+                        .orElseThrow(() -> new EntityNotFoundException("Skill não encontrada: " + id)))
+                .collect(Collectors.toSet());
 
-        //atualiza roles (buscando as gerenciadas no banco)
-        Set<Role> managedRoles = new HashSet<>();
-        if (userUpdate.getRoles() != null) {
-            for (Role role : userUpdate.getRoles()) {
-                Role managedRole = roleRepository.findById(role.getRoleId())
-                        .orElseThrow(() -> new EntityNotFoundException("Role não encontrada: " + role.getRoleId()));
-                managedRoles.add(managedRole);
-            }
-        }
-        user.setRoles(managedRoles);
-
-        //atualiza skills (buscando as gerenciadas no banco)
-        Set<Skill> managedSkills = new HashSet<>();
-        if (userUpdate.getSkills() != null) {
-            for (Skill skill : userUpdate.getSkills()) {
-                Skill managedSkill = skillRepository.findById(skill.getSkillId())
-                        .orElseThrow(() -> new EntityNotFoundException("Skill não encontrada: " + skill.getSkillId()));
-                managedSkills.add(managedSkill);
-            }
-        }
         user.setSkills(managedSkills);
+        return userRepository.save(user);
+    }
 
-        //atualiza perfil
-        //se for um perfil novo, salva ele primeiro para gerar id
-        if (userUpdate.getProfile() != null) {
-            if (userUpdate.getProfile().getProfileId() != null) {
-                Profile managedProfile = profileRepository.findById(userUpdate.getProfile().getProfileId())
-                        .orElseThrow(() -> new EntityNotFoundException(
-                                "Profile não encontrado: " + userUpdate.getProfile().getProfileId()));
-                user.setProfile(managedProfile);
-            } else {
-                //perfil novo, salvar antes e associar
-                profileRepository.save(userUpdate.getProfile());
-                user.setProfile(userUpdate.getProfile());
-            }
-            user.getProfile().setUser(user);
-        } else {
-            user.setProfile(null);
+    @Override
+    public User addRoles(UUID userId, List<Long> roleIds) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
+
+        Set<Role> managedRoles = roleIds.stream()
+                .map(id -> roleRepository.findById(id)
+                        .orElseThrow(() -> new EntityNotFoundException("Role não encontrada: " + id)))
+                .collect(Collectors.toSet());
+
+        user.setRoles(managedRoles);
+        return userRepository.save(user);
+    }
+
+    public User update(UUID id, User user) {
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
+
+        existingUser.setUsername(user.getUsername());
+        existingUser.setPassword(user.getPassword());
+
+        // Atualiza roles de forma segura
+        if (user.getRoles() != null) {
+            Set<Role> newRoles = new HashSet<>(user.getRoles());
+            existingUser.setRoles(newRoles);
         }
 
-        return userRepository.save(user);
+        // Atualiza skills de forma segura
+        if (user.getSkills() != null) {
+            Set<Skill> newSkills = new HashSet<>(user.getSkills());
+            existingUser.setSkills(newSkills);
+        }
+
+        // Atualiza profile se necessário
+        if (user.getProfile() != null) {
+            existingUser.setProfile(user.getProfile());
+        }
+
+        return userRepository.save(existingUser);
     }
 
     @Override
